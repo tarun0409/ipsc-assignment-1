@@ -36,7 +36,7 @@ int main()
     {
         for(int j=0; j<n1; j++)
         {
-            cout<<matrix1[i][j]<<" ";
+            cout<<matrix1[i][j]<<"\t";
         }
         cout<<endl;
     }
@@ -45,7 +45,7 @@ int main()
     {
         for(int j=0; j<n2; j++)
         {
-            cout<<matrix2[i][j]<<" ";
+            cout<<matrix2[i][j]<<"\t";
         }
         cout<<endl;
     }
@@ -57,8 +57,6 @@ int main()
             product[i][j] = 0;
             for(int k = 0; k<n1; k++)
             {
-                // cout<<"i = "<<i<<" j= "<<j<<" k = "<<k;
-                // printf("\n");
                 product[i][j] = product[i][j] + matrix1[i][k]*matrix2[k][j];
             }
         }
@@ -68,7 +66,7 @@ int main()
     {
         for(int j=0; j<n2; j++)
         {
-            cout<<product[i][j]<<" ";
+            cout<<product[i][j]<<"\t";
         }
         cout<<endl;
     }
