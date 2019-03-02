@@ -71,31 +71,31 @@ int main()
 
     int row_indices1[nz1], col_indices1[nz1], val1[nz1];
     int row_indices2[nz2], col_indices2[nz2], val2[nz2];
-    int temp_nz1 = nz1;
-    int temp_nz2 = nz2;
+    int index = 0;
     for(int i=0; i<m1; i++)
     {
         for(int j=0; j<n1; j++)
         {
             if(matrix1[i][j]!=0)
             {
-                int index = --temp_nz1;
-                row_indices1[index] = i;
-                col_indices1[index] = j;
-                val1[index] = matrix1[i][j];
+                int temp_index = index++;
+                row_indices1[temp_index] = i;
+                col_indices1[temp_index] = j;
+                val1[temp_index] = matrix1[i][j];
             }
         }
     }
+    index = 0;
     for(int i=0; i<m2; i++)
     {
         for(int j=0; j<n2; j++)
         {
             if(matrix2[i][j]!=0)
             {
-                int index = --temp_nz2;
-                row_indices2[index] = i;
-                col_indices2[index] = j;
-                val2[index] = matrix2[i][j];
+                int temp_index = index++;
+                row_indices2[temp_index] = i;
+                col_indices2[temp_index] = j;
+                val2[temp_index] = matrix2[i][j];
             }
         }
     }
