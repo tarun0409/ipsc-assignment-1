@@ -1,0 +1,11 @@
+1.For dense matrices storage is m*n where m = number of rows of A, n = number of columns of B
+Number of flops for multiplication will be (#rowsOfA x #colsOfB x #colsOfA)
+
+2.For banded matrices the storage complexity is number of non zero values.
+Number of flops for multiplication will be (#rowsOfA x #colsOfB x #colsOfA)
+
+3.For COO storage complexity is 2*(number of non-zero values)
+Number of flops will be (num of non-zero values)^3
+
+4.For CSR format storage complexity will be (number of row pointers)+(number of non-zero values)*2
+Flop count will be (numbef of rows * number of non-zero values of 1st matrix * number of non-zero values of 2nd matrix)
