@@ -19,29 +19,44 @@ int lcm(int a, int b)
     return (a*b)/gcd(a,b);
 }
 
-int main()
+double * foreward(double ** L, double * b, int n)
 {
-    int m,n;
-    cout<<"\nEnter the number of linear equations : ";
-    cin>>m;
-    cout<<"\nEnter the number of variables : ";
-    cin>>n;
-    double matrix[m][n];
-    double U[m][n];
-    double x[n],y[n],b[n];
-    cout<<"\nEnter the values of A matrix (coefficients of left side of linear equation) : ";
-    for(int i=0; i<m; i++)
-    {
-        for(int j=0; j<n; j++)
-        {
-            cin>>matrix[i][j];
-            U[i][j] = matrix[i][j];
-        }
-    }
-    cout<<"\nEnter the values of b vector (right side of linear equation) : ";
+    double * y = (double *)calloc(n,sizeof(double));
     for(int i=0; i<n; i++)
     {
-        cin>>b[i];
+        for(int j=0; j<i; j++)
+        {
+            b[i] = b[i] - (L[i][j]*y[j]);
+        }
+        y[i] = b[i]/L[i][i];
+    }
+    return y;
+}
+
+double * back(double ** U, double * y, int n)
+{
+    double * x = (double *)calloc(n,sizeof(double));
+    for(int i=(n-1); i>=0; i--)
+    {
+        for(int j=(n-1); j>i; j--)
+        {
+            y[i] = y[i] - (U[i][j]*x[j]);
+        }
+        x[i] = y[i]/U[i][i];
+    }
+    return x;
+}
+
+double * lu_solve(double ** matrix, double * b, int m, int n)
+{
+    double ** U = (double **)calloc(m,sizeof(double *));
+    for(int i=0; i<m; i++)
+    {
+        U[i] = (double *)calloc(n,sizeof(double));
+        for(int j=0; j<n; j++)
+        {
+            U[i][j] = matrix[i][j];
+        }
     }
     double ** L = (double **)calloc(m,sizeof(double *));
     for(int i=0; i<m; i++)
@@ -76,51 +91,38 @@ int main()
         start_index++;
     }
 
-    cout<<"\nU matrix: \n";
+    //forward sweep
+    double * y = foreward(L,b,n);
+
+    //backward sweep
+    double * x = back(U,y,n);
+}
+
+int main()
+{
+    int m,n;
+    cout<<"\nEnter the number of linear equations : ";
+    cin>>m;
+    cout<<"\nEnter the number of variables : ";
+    cin>>n;
+    double ** matrix = (double **)calloc(m,sizeof(double *));
+    double * b = (double *)calloc(n,sizeof(double));
+    cout<<"\nEnter the values of A matrix (coefficients of left side of linear equation) : ";
     for(int i=0; i<m; i++)
     {
+        matrix[i] = (double *)calloc(n,sizeof(double));
         for(int j=0; j<n; j++)
         {
-            cout<<U[i][j]<<"\t";
+            cin>>matrix[i][j];
         }
-        cout<<endl;
     }
-
-    cout<<"\nL matrix: \n";
-    for(int i=0; i<m; i++)
-    {
-        for(int j=0; j<m; j++)
-        {
-            cout<<L[i][j]<<"\t";
-        }
-        cout<<endl;
-    }
-
-    //forward sweep
+    cout<<"\nEnter the values of b vector (right side of linear equation) : ";
     for(int i=0; i<n; i++)
     {
-        for(int j=0; j<i; j++)
-        {
-            b[i] = b[i] - (L[i][j]*y[j]);
-        }
-        y[i] = b[i]/L[i][i];
+        cin>>b[i];
     }
-
-    cout<<"\ny = ";
-    for(int i=0; i<n; i++)
-    {
-        cout<<y[i]<<" ";
-    }
-    cout<<endl;
-
-    for(int i=(n-1); i>=0; i--)
-    {
-        for(int j=(n-1); j>i; j--)
-        {
-            y[i] = y[i] - (U[i][j]*x[j]);
-        }
-        x[i] = y[i]/U[i][i];
-    }
+    
+    double * x = lu_solve(matrix,b,m,n);
 
     cout<<"\nx = ";
     for(int i=0; i<n; i++)

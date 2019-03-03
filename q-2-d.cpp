@@ -19,7 +19,7 @@ int lcm(int a, int b)
     return (a*b)/gcd(a,b);
 }
 
-int val_at(int i, int j, int * row_vec, int * col_vec, int * val_vec, int m, int nz)
+int val_at(int i, int j, double * row_vec, double * col_vec, double * val_vec, int m, int nz)
 {
     int nz_col = row_vec[i];
     int nxt_nz_col = nz;
@@ -41,61 +41,44 @@ int val_at(int i, int j, int * row_vec, int * col_vec, int * val_vec, int m, int
     return 0;
 }
 
-int main()
+double * foreward(double ** L, double * b, int n)
 {
-    int m,n;
-    cout<<"\nEnter the number of linear equations : ";
-    cin>>m;
-    cout<<"\nEnter the number of variables : ";
-    cin>>n;
-    double matrix[m][n];
-    double U[m][n];
-    double x[n],y[n],b[n];
-    int nz = 0;
-    cout<<"\nEnter the values of A matrix (coefficients of left side of linear equation) : ";
-    for(int i=0; i<m; i++)
-    {
-        for(int j=0; j<n; j++)
-        {
-            cin>>matrix[i][j];
-            if(matrix[i][j] != 0)
-            {
-                nz++;
-            }
-            U[i][j] = matrix[i][j];
-        }
-    }
-
-    int * row = (int *)calloc((m+1),sizeof(int));
-    int * col = (int *)calloc(nz,sizeof(int));
-    int * val = (int *)calloc(nz,sizeof(int));
-
-    int nz_i = 0;
-    int nz_r = 0;
-    for(int i=0; i<m; i++)
-    {
-        bool found = false;
-        for(int j=0; j<n; j++)
-        {
-            if(matrix[i][j]!=0)
-            {
-                int index = nz_i++;
-                val[index] = matrix[i][j];
-                col[index] = j;
-                if(!found)
-                {
-                    found = true;
-                    row[nz_r++] = index;
-                }
-            }
-        }
-    }
-    row[nz_r] = nz+1;
-
-    cout<<"\nEnter the values of b vector (right side of linear equation) : ";
+    double * y = (double *)calloc(n,sizeof(double));
     for(int i=0; i<n; i++)
     {
-        cin>>b[i];
+        for(int j=0; j<i; j++)
+        {
+            b[i] = b[i] - (L[i][j]*y[j]);
+        }
+        y[i] = b[i]/L[i][i];
+    }
+    return y;
+}
+
+double * back(double ** U, double * y, int n)
+{
+    double * x = (double *)calloc(n,sizeof(double));
+    for(int i=(n-1); i>=0; i--)
+    {
+        for(int j=(n-1); j>i; j--)
+        {
+            y[i] = y[i] - (U[i][j]*x[j]);
+        }
+        x[i] = y[i]/U[i][i];
+    }
+    return x;
+}
+
+double * lu_solve(double * row, double * col, double * val, int nz, double * b, int m, int n)
+{
+    double ** U = (double **)calloc(m,sizeof(double *));
+    for(int i=0; i<m; i++)
+    {
+        U[i] = (double *)calloc(n,sizeof(double));
+        for(int j=0; j<n; j++)
+        {
+            U[i][j] = val_at(i,j,row,val,val,m,nz);
+        }
     }
     double ** L = (double **)calloc(m,sizeof(double *));
     for(int i=0; i<m; i++)
@@ -103,27 +86,6 @@ int main()
         L[i] = (double *)calloc(m,sizeof(double));
         L[i][i] = 1;
     }
-
-    cout<<"\nCSR of matrix 1 : \n";
-    cout<<"Values : ";
-    for(int i=0; i<nz; i++)
-    {
-        cout<<val[i]<<" ";
-    }
-    cout<<endl;
-    cout<<"Cols : ";
-    for(int i=0; i<nz; i++)
-    {
-        cout<<col[i]<<" ";
-    }
-    cout<<endl;
-    cout<<"Rows : ";
-    for(int i=0; i<(m+1); i++)
-    {
-        cout<<row[i]<<" ";
-    }
-    cout<<endl;
-
     int start_index = 0;
     for(int j=0; j<m; j++)
     {
@@ -151,51 +113,90 @@ int main()
         start_index++;
     }
 
-    cout<<"\nU matrix: \n";
+    //forward sweep
+    double * y = foreward(L,b,n);
+
+    //backward sweep
+    double * x = back(U,y,n);
+}
+
+
+int main()
+{
+    int m,n;
+    cout<<"\nEnter the number of linear equations : ";
+    cin>>m;
+    cout<<"\nEnter the number of variables : ";
+    cin>>n;
+    double ** matrix = (double **)calloc(m,sizeof(double *));
+    double * b = (double *)calloc(n,sizeof(double));
+    cout<<"\nEnter the values of A matrix (coefficients of left side of linear equation) : ";
+    int nz = 0;
     for(int i=0; i<m; i++)
     {
+        matrix[i] = (double *)calloc(n,sizeof(double));
         for(int j=0; j<n; j++)
         {
-            cout<<U[i][j]<<"\t";
+            cin>>matrix[i][j];
+            if(matrix[i][j]!=0)
+            {
+                nz++;
+            }
         }
-        cout<<endl;
     }
+    cout<<"\nEnter the values of b vector (right side of linear equation) : ";
+    for(int i=0; i<n; i++)
+    {
+        cin>>b[i];
+    }
+    
+    double * row = (double *)calloc((m+1),sizeof(double));
+    double * col = (double *)calloc(nz,sizeof(double));
+    double * val = (double *)calloc(nz,sizeof(double));
 
-    cout<<"\nL matrix: \n";
+    int nz_i = 0;
+    int nz_r = 0;
     for(int i=0; i<m; i++)
     {
-        for(int j=0; j<m; j++)
+        bool found = false;
+        for(int j=0; j<n; j++)
         {
-            cout<<L[i][j]<<"\t";
+            if(matrix[i][j]!=0)
+            {
+                int index = nz_i++;
+                val[index] = matrix[i][j];
+                col[index] = j;
+                if(!found)
+                {
+                    found = true;
+                    row[nz_r++] = index;
+                }
+            }
         }
-        cout<<endl;
     }
+    row[nz_r] = nz+1;
 
-    //forward sweep
-    for(int i=0; i<n; i++)
+    cout<<"\nCSR of matrix 1 : \n";
+    cout<<"Values : ";
+    for(int i=0; i<nz; i++)
     {
-        for(int j=0; j<i; j++)
-        {
-            b[i] = b[i] - (L[i][j]*y[j]);
-        }
-        y[i] = b[i]/L[i][i];
+        cout<<val[i]<<" ";
     }
-
-    cout<<"\ny = ";
-    for(int i=0; i<n; i++)
+    cout<<endl;
+    cout<<"Cols : ";
+    for(int i=0; i<nz; i++)
     {
-        cout<<y[i]<<" ";
+        cout<<col[i]<<" ";
+    }
+    cout<<endl;
+    cout<<"Rows : ";
+    for(int i=0; i<(m+1); i++)
+    {
+        cout<<row[i]<<" ";
     }
     cout<<endl;
 
-    for(int i=(n-1); i>=0; i--)
-    {
-        for(int j=(n-1); j>i; j--)
-        {
-            y[i] = y[i] - (U[i][j]*x[j]);
-        }
-        x[i] = y[i]/U[i][i];
-    }
+    double * x = lu_solve(row,col,val,nz,b,m,n);
 
     cout<<"\nx = ";
     for(int i=0; i<n; i++)

@@ -19,19 +19,14 @@ int lcm(int a, int b)
     return (a*b)/gcd(a,b);
 }
 
-int main()
+double *** mylu(double ** matrix, int m, int n)
 {
-    int m,n;
-    cout<<"\nEnter the dimensions of the matrix : ";
-    cin>>m>>n;
-    double matrix[m][n];
-    double U[m][n];
-    cout<<"\nEnter the elements of the matrix in row major order : ";
+    double ** U = (double **)calloc(m,sizeof(double *));
     for(int i=0; i<m; i++)
     {
+        U[i] = (double *)calloc(n,sizeof(double));
         for(int j=0; j<n; j++)
         {
-            cin>>matrix[i][j];
             U[i][j] = matrix[i][j];
         }
     }
@@ -67,6 +62,31 @@ int main()
         }
         start_index++;
     }
+    double *** lu = (double ***)calloc(2, sizeof(double **));
+    lu[0] = L;
+    lu[1] = U; 
+    return lu;
+}
+
+int main()
+{
+    int m,n;
+    cout<<"\nEnter the dimensions of the matrix : ";
+    cin>>m>>n;
+    double ** matrix = (double **)calloc(m,sizeof(double *));
+    cout<<"\nEnter the elements of the matrix in row major order : ";
+    for(int i=0; i<m; i++)
+    {
+        matrix[i] = (double *)calloc(n,sizeof(double));
+        for(int j=0; j<n; j++)
+        {
+            cin>>matrix[i][j];
+        }
+    }
+
+    double *** lu = mylu(matrix,m,n);
+    double ** L = lu[0];
+    double ** U = lu[1];
 
     cout<<"\nU matrix: \n";
     for(int i=0; i<m; i++)
@@ -93,3 +113,5 @@ int main()
 
     return 0;
 }
+
+//foreward and backward functions written in q-2-b
