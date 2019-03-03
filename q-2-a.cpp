@@ -44,16 +44,16 @@ int main()
     int start_index = 0;
     for(int j=0; j<m; j++)
     {
-        if(matrix[start_index][j]==0)
+        if(U[start_index][j]==0)
         {
             continue;
         }
-        int main_val = matrix[start_index][j];
+        int main_val = U[start_index][j];
         for(int i=(start_index+1); i<m; i++)
         {
-            L[i][j] = matrix[i][j]/main_val;
+            L[i][j] = U[i][j]/main_val;
             
-            int curr_val = matrix[i][j];
+            int curr_val = U[i][j];
             int l = lcm(main_val>=0?main_val:(-1*main_val),curr_val>=0?curr_val:(-1*curr_val));
             int main_mul = l/main_val;
             main_mul = main_mul>=0?main_mul:(-1*main_mul);
@@ -62,7 +62,7 @@ int main()
             int b = ((main_val>=0 && curr_val>=0)||(main_val<=0 && curr_val<=0))?-1:1;
             for(int k=j; k<n; k++)
             {
-                matrix[i][k] = (curr_mul*matrix[i][k]) + (b*main_mul*matrix[start_index][k]);
+                U[i][k] = (curr_mul*U[i][k]) + (b*main_mul*U[start_index][k]);
             }
         }
         start_index++;
@@ -73,7 +73,7 @@ int main()
     {
         for(int j=0; j<n; j++)
         {
-            cout<<matrix[i][j]<<"\t";
+            cout<<U[i][j]<<"\t";
         }
         cout<<endl;
 
