@@ -121,7 +121,7 @@ int main()
         }
         cout<<endl;
     }
-    cout<<"\nb vetor is : ";
+    cout<<"\nb vector is : ";
     for(int i=0; i<m; i++)
     {
         cout<<b[i][0]<<" ";
