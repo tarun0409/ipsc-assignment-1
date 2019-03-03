@@ -83,51 +83,22 @@ double ** matrix_multiply(double ** A, double ** B, int m1, int n1, int m2, int 
     return C;
 }
 
-int main()
+double ** my_qr(double ** A, double ** b, int m, int n)
 {
-    int m,n;
-    cout<<"\nEnter the number of linear equations : ";
-    cin>>m;
-    cout<<"\nEnter the number of variables : ";
-    cin>>n;
-    cout<<"\nEnter the elements of the matrix A in row major order :";
-    double ** A = (double **)calloc(m,sizeof(double *));
-    double ** orth = (double **)calloc(m,sizeof(double *));
+    double ** Q = (double **)calloc(m,sizeof(double *));
     for(int i=0; i<m; i++)
     {
-        A[i] = (double *)calloc(n,sizeof(double));
-        orth[i] = (double *)calloc(n,sizeof(double));
-        for(int j=0; j<n;j++)
+        Q[i] = (double *)calloc(n,sizeof(double));
+        for(int j=0; j<n; j++)
         {
-            cin>>A[i][j];
-            orth[i][j] = A[i][j];
+            Q[i][j] = A[i][j];
         }
     }
-    cout<<"\nEnter the elements of b (RHS) : ";
-    double ** b = (double **)calloc(m,sizeof(double *));
     double ** x = (double **)calloc(m,sizeof(double *));
     for(int i=0; i<m; i++)
     {
-        b[i] = (double *)calloc(1,sizeof(double));
         x[i] = (double *)calloc(1,sizeof(double));
-        cin>>b[i][0];
     }
-    cout<<"\nThe A matrix is : \n";
-    for(int i=0; i<m; i++)
-    {
-        for(int j=0; j<n; j++)
-        {
-            cout<<A[i][j]<<"\t";
-        }
-        cout<<endl;
-    }
-    cout<<"\nb vector is : ";
-    for(int i=0; i<m; i++)
-    {
-        cout<<b[i][0]<<" ";
-    }
-    cout<<endl;
-
     for(int j=1; j<n; j++)
     {
         double * curr_vector = (double *)calloc(m,sizeof(double));
@@ -146,7 +117,7 @@ int main()
             double * curr_basis = (double *)calloc(m,sizeof(double));
             for(int i=0; i<m; i++)
             {
-                curr_basis[i] = orth[i][k];
+                curr_basis[i] = Q[i][k];
             }
 
             double dot1 = dot_vectors(curr_vector,curr_basis,m);
@@ -159,7 +130,7 @@ int main()
         }
         for(int i=0; i<m; i++)
         {
-            orth[i][j] = curr_diff[i];
+            Q[i][j] = curr_diff[i];
         }
     }
 
@@ -169,12 +140,12 @@ int main()
         double * vec = (double *)calloc(m,sizeof(double));
         for(int i=0; i<m; i++)
         {
-            vec[i] = orth[i][j];
+            vec[i] = Q[i][j];
         }
         double mag = magnitude_vector(vec,m);
         for(int i=0; i<m; i++)
         {
-            orth[i][j] = orth[i][j]/mag;
+            Q[i][j] = Q[i][j]/mag;
         }
     }
 
@@ -183,12 +154,12 @@ int main()
     {
         for(int j=0; j<n; j++)
         {
-            cout<<orth[i][j]<<"\t";
+            cout<<Q[i][j]<<"\t";
         }
         cout<<endl;
     }
 
-    double ** qt = transpose_matrix(orth,m,n);
+    double ** qt = transpose_matrix(Q,m,n);
     
     double ** R = matrix_multiply(qt, A, n,m,m,n);
 
@@ -213,6 +184,53 @@ int main()
         }
         x[i][0] = y[i][0]/R[i][i];
     }
+    return x;
+}
+
+int main()
+{
+    int m,n;
+    cout<<"\nEnter the number of linear equations : ";
+    cin>>m;
+    cout<<"\nEnter the number of variables : ";
+    cin>>n;
+    cout<<"\nEnter the elements of the matrix A in row major order :";
+    double ** A = (double **)calloc(m,sizeof(double *));
+    double ** orth = (double **)calloc(m,sizeof(double *));
+    for(int i=0; i<m; i++)
+    {
+        A[i] = (double *)calloc(n,sizeof(double));
+        orth[i] = (double *)calloc(n,sizeof(double));
+        for(int j=0; j<n;j++)
+        {
+            cin>>A[i][j];
+            orth[i][j] = A[i][j];
+        }
+    }
+    cout<<"\nEnter the elements of b (RHS) : ";
+    double ** b = (double **)calloc(m,sizeof(double *));
+    for(int i=0; i<m; i++)
+    {
+        b[i] = (double *)calloc(1,sizeof(double));
+        cin>>b[i][0];
+    }
+    cout<<"\nThe A matrix is : \n";
+    for(int i=0; i<m; i++)
+    {
+        for(int j=0; j<n; j++)
+        {
+            cout<<A[i][j]<<"\t";
+        }
+        cout<<endl;
+    }
+    cout<<"\nb vector is : ";
+    for(int i=0; i<m; i++)
+    {
+        cout<<b[i][0]<<" ";
+    }
+    cout<<endl;
+
+    double ** x = my_qr(A,b,m,n);
 
     cout<<"\nx vector is : ";
     for(int i=0; i<m; i++)
